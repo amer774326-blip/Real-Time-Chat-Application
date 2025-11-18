@@ -29,7 +29,7 @@ global.io = io;
 app.locals.moment = moment;
 
 //database connection
-mongoose.set( strictQuery , false);
+mongoose.set('strictQuery', false);
 mongoose
   .connect(process.env.DATABASE_URL, {
     useNewUrlParser: true,
@@ -63,5 +63,5 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 server.listen(process.env.PORT, () => {
-  console.log(App is listening to port: ${process.env.PORT});
+  console.log(`App is listening to port: ${process.env.PORT}`);
 });
