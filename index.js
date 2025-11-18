@@ -19,7 +19,6 @@ const {
 //app initialization
 const app = express();
 const server = http.createServer(app);
-//config dotenv to access env file
 dotenv.config();
 
 //socket creation
@@ -30,8 +29,9 @@ global.io = io;
 app.locals.moment = moment;
 
 //database connection
+mongoose.set( strictQuery , false);
 mongoose
-  .connect(process.env.MONGO_CONNECTION_STRING, {
+  .connect(process.env.DATABASE_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -62,6 +62,6 @@ app.use(notFoundHandler);
 //common error handler
 app.use(errorHandler);
 
-app.listen(process.env.PORT, () => {
-  console.log(`app is listening to port: ${process.env.PORT}`);
+server.listen(process.env.PORT, () => {
+  console.log(App is listening to port: ${process.env.PORT});
 });
