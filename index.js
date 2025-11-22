@@ -52,6 +52,3 @@ app.use(errorHandler);
 server.listen(process.env.PORT, () => {
   console.log(`App is listening to port: ${process.env.PORT}`);
 });
-```http://googleusercontent.com/generated_image_content/0
-
-
