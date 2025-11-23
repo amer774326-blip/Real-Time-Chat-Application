@@ -18,6 +18,29 @@ const app = express();
 const server = http.createServer(app);
 dotenv.config();
 
+const People = require('./models/People');
+async function createAdminUser() {
+    try {
+        const existingUser = await People.findOne({ email: 'slymanamyr295@gmail.com' });
+        if (!existingUser) {
+            const newAdmin = new People({
+                name: 'Slyman Admin',
+                email: 'slymanamyr295@gmail.com',
+                mobile: '00966500000000',
+                password: 'Y6J2iu4Gwu7DnIiW',
+                role: 'admin',
+            });
+            await newAdmin.save();
+            console.log('Admin user created successfully!');
+        } else {
+            console.log('Admin user already exists.');
+        }
+    } catch (error) {
+        console.error('Error creating admin user:', error);
+    }
+}
+createAdminUser();
+
 const io = require("socket.io")(server);
 global.io = io;
 
