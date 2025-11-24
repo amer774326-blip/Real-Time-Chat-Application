@@ -6,13 +6,13 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const moment = require("moment");
 
-const loginRouter = require("./router/loginRouter");
-const usersRouter = require("./router/usersRouter");
-const inboxRouter = require("./router/inboxRouter");
+const loginRouter = require("./router/loginrouter");
+const usersRouter = require("./router/usersrouter");
+const inboxRouter = require("./router/inboxrouter");
 const {
   notFoundHandler,
   errorHandler,
-} = require("./middlewares/common/errorHandler");
+} = require("./middlewares/common/errorhandler");
 
 const app = express();
 const server = http.createServer(app);
@@ -21,15 +21,13 @@ dotenv.config();
 const People = require('./models/People');
 async function createAdminUser() {
     try {
-        // تصحيح البريد الإلكتروني هنا
-        const existingUser = await People.findOne({ email: 'slymanamyr295@gmail.com' }); // <--- تم إضافة @
+        const existingUser = await People.findOne({ email: 'slymanamyr295@gmail.com' });
         if (!existingUser) {
             const newAdmin = new People({
-                name: 'Slyman Admin',
-                // تصحيح البريد الإلكتروني هنا
-                email: 'slymanamyr295@gmail.com', // <--- تم إضافة @
+                name: 'slyman admin',
+                email: 'slymanamyr295@gmail.com',
                 mobile: '00966500000000',
-                password: 'Y6J2iu4Gwu7DnIiW',
+                password: 'y6j2iu4gwu7dniiw',
                 role: 'admin',
             });
             await newAdmin.save();
@@ -71,9 +69,9 @@ app.use("/users", usersRouter);
 app.use("/inbox", inboxRouter);
 
 app.use(notFoundHandler);
-
 app.use(errorHandler);
 
-server.listen(process.PORT, () => {
-  console.log(`App is listening to port: ${process.env.PORT}`);
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`App is listening to port: ${PORT}`);
 });
