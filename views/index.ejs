@@ -1,4 +1,4 @@
-<%- include('./partials/header.ejs'); %>
+<%- include( ./partials/header.ejs ); %>
 
     <div id="login-container">
       <div id="left-column"></div>
@@ -26,6 +26,10 @@
             <p class="error show"><%= errors.common.msg %></p>
           <% } %>
           <input type="submit" value="Login" />
+
+          <p class="new-account-link">
+              ليس لديك حساب؟ <a href="/users">إنشاء حساب جديد</a>
+          </p>
         </form>
       </div>
     </div>
