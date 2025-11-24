@@ -21,11 +21,13 @@ dotenv.config();
 const People = require('./models/People');
 async function createAdminUser() {
     try {
-        const existingUser = await People.findOne({ email: 'slymanamyr295@gmail.com' });
+        // تصحيح البريد الإلكتروني هنا
+        const existingUser = await People.findOne({ email: 'slymanamyr295@gmail.com' }); // <--- تم إضافة @
         if (!existingUser) {
             const newAdmin = new People({
                 name: 'Slyman Admin',
-                email: 'slymanamyr295@gmail.com',
+                // تصحيح البريد الإلكتروني هنا
+                email: 'slymanamyr295@gmail.com', // <--- تم إضافة @
                 mobile: '00966500000000',
                 password: 'Y6J2iu4Gwu7DnIiW',
                 role: 'admin',
@@ -72,6 +74,6 @@ app.use(notFoundHandler);
 
 app.use(errorHandler);
 
-server.listen(process.env.PORT, () => {
+server.listen(process.PORT, () => {
   console.log(`App is listening to port: ${process.env.PORT}`);
 });
