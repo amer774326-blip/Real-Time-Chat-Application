@@ -6,37 +6,39 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const moment = require("moment");
 
-const loginRouter = require("./router/loginrouter");
-const usersRouter = require("./router/usersrouter");
-const inboxRouter = require("./router/inboxrouter");
+const loginRouter = require("./router/loginRouter");
+const usersRouter = require("./router/usersRouter");
+const inboxRouter = require("./router/inboxRouter");
 const {
   notFoundHandler,
   errorHandler,
-} = require("./middlewares/common/errorhandler");
+} = require("./middlewares/common/errorHandler");
 
 const app = express();
 const server = http.createServer(app);
 dotenv.config();
 
-const People = require('./models/People');
+const People = require( ./models/People );
 async function createAdminUser() {
     try {
-        const existingUser = await People.findOne({ email: 'slymanamyr295@gmail.com' });
+        // تصحيح البريد الإلكتروني هنا
+        const existingUser = await People.findOne({ email:  slymanamyr295@gmail.com  }); // <--- تم إضافة @
         if (!existingUser) {
             const newAdmin = new People({
-                name: 'slyman admin',
-                email: 'slymanamyr295@gmail.com',
-                mobile: '00966500000000',
-                password: 'y6j2iu4gwu7dniiw',
-                role: 'admin',
+                name:  Slyman Admin ,
+                // تصحيح البريد الإلكتروني هنا
+                email:  slymanamyr295@gmail.com , // <--- تم إضافة @
+                mobile:  00966500000000 ,
+                password:  Y6J2iu4Gwu7DnIiW ,
+                role:  admin ,
             });
             await newAdmin.save();
-            console.log('Admin user created successfully!');
+            console.log( Admin user created successfully! );
         } else {
-            console.log('Admin user already exists.');
+            console.log( Admin user already exists. );
         }
     } catch (error) {
-        console.error('Error creating admin user:', error);
+        console.error( Error creating admin user: , error);
     }
 }
 createAdminUser();
@@ -69,9 +71,9 @@ app.use("/users", usersRouter);
 app.use("/inbox", inboxRouter);
 
 app.use(notFoundHandler);
+
 app.use(errorHandler);
 
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-  console.log(`App is listening to port: ${PORT}`);
+server.listen(process.PORT, () => {
+  console.log(`App is listening to port: ${process.env.PORT}`);
 });
