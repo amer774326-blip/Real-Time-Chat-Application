@@ -6,37 +6,37 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const moment = require("moment");
 
-const LoginRouter = require("./router/loginrouter");
-const UsersRouter = require("./router/usersrouter");
-const InboxRouter = require("./router/inboxrouter");
+const LoginRouter = require("./router/LoginRouter");
+const UsersRouter = require("./router/UsersRouter");
+const InboxRouter = require("./router/InboxRouter");
 const {
   notFoundHandler,
   errorHandler,
-} = require("./middlewares/common/errorhandler");
+} = require("./middlewares/common/errorHandler");
 
 const app = express();
 const server = http.createServer(app);
 dotenv.config();
 
-const People = require('./models/People');
+const People = require( ./models/People );
 async function createAdminUser() {
     try {
-        const existingUser = await People.findOne({ email: 'slymanamyr295@gmail.com' });
+        const existingUser = await People.findOne({ email:  slymanamyr295@gmail.com  });
         if (!existingUser) {
             const newAdmin = new People({
-                name: 'slyman admin',
-                email: 'slymanamyr295@gmail.com',
-                mobile: '00966500000000',
-                password: 'y6j2iu4gwu7dniiw',
-                role: 'admin',
+                name:  slyman admin ,
+                email:  slymanamyr295@gmail.com ,
+                mobile:  00966500000000 ,
+                password:  y6j2iu4gwu7dniiw ,
+                role:  admin ,
             });
             await newAdmin.save();
-            console.log('Admin user created successfully!');
+            console.log( Admin user created successfully! );
         } else {
-            console.log('Admin user already exists.');
+            console.log( Admin user already exists. );
         }
     } catch (error) {
-        console.error('Error creating admin user:', error);
+        console.error( Error creating admin user: , error);
     }
 }
 createAdminUser();
