@@ -48,7 +48,7 @@ app.locals.moment = moment;
 
 mongoose.set("strictQuery", true);
 mongoose
-  .connect(process.env.DATABASE_URL)
+  .connect(process.env.database_url)
   .then(() => console.log("Database connection successful!"))
   .catch((err) => console.error("Database connection error:", err));
 
