@@ -6,13 +6,13 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const moment = require("moment");
 
-const loginRouter = require("./router/loginRouter");
-const usersRouter = require("./router/usersRouter");
-const inboxRouter = require("./router/inboxRouter");
+const LoginRouter = require("./router/loginrouter");
+const UsersRouter = require("./router/usersrouter");
+const InboxRouter = require("./router/inboxrouter");
 const {
   notFoundHandler,
   errorHandler,
-} = require("./middlewares/common/errorHandler");
+} = require("./middlewares/common/errorhandler");
 
 const app = express();
 const server = http.createServer(app);
@@ -21,15 +21,13 @@ dotenv.config();
 const People = require( ./models/People );
 async function createAdminUser() {
     try {
-        // تصحيح البريد الإلكتروني هنا
-        const existingUser = await People.findOne({ email:  slymanamyr295@gmail.com  }); // <--- تم إضافة @
+        const existingUser = await People.findOne({ email:  slymanamyr295@gmail.com  });
         if (!existingUser) {
             const newAdmin = new People({
-                name:  Slyman Admin ,
-                // تصحيح البريد الإلكتروني هنا
-                email:  slymanamyr295@gmail.com , // <--- تم إضافة @
+                name:  slyman admin ,
+                email:  slymanamyr295@gmail.com ,
                 mobile:  00966500000000 ,
-                password:  Y6J2iu4Gwu7DnIiW ,
+                password:  y6j2iu4gwu7dniiw ,
                 role:  admin ,
             });
             await newAdmin.save();
@@ -50,10 +48,7 @@ app.locals.moment = moment;
 
 mongoose.set("strictQuery", true);
 mongoose
-  .connect(process.env.DATABASE_URL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect(process.env.DATABASE_URL)
   .then(() => console.log("Database connection successful!"))
   .catch((err) => console.error("Database connection error:", err));
 
@@ -66,14 +61,14 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
-app.use("/", loginRouter);
-app.use("/users", usersRouter);
-app.use("/inbox", inboxRouter);
+app.use("/", LoginRouter);
+app.use("/users", UsersRouter);
+app.use("/inbox", InboxRouter);
 
 app.use(notFoundHandler);
-
 app.use(errorHandler);
 
-server.listen(process.PORT, () => {
-  console.log(`App is listening to port: ${process.env.PORT}`);
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`App is listening to port: ${PORT}`);
 });
