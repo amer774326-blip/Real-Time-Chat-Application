@@ -1,74 +1,68 @@
-const express = require("express");
-const http = require("http");
-const dotenv = require("dotenv");
-const mongoose = require("mongoose");
-const path = require("path");
-const cookieParser = require("cookie-parser");
-const moment = require("moment");
+const express = require( express );
+const http = require( http );
+const mongoose = require( mongoose );
+const dotenv = require( dotenv );
+const cookieParser = require( cookie-parser );
+const moment = require( moment );
+const path = require( path );
 
-const LoginRouter = require("./router/LoginRouter");
-const UsersRouter = require("./router/UsersRouter");
-const InboxRouter = require("./router/InboxRouter");
-const {
-  notFoundHandler,
-  errorHandler,
-} = require("./middlewares/common/errorHandler");
+dotenv.config();
 
 const app = express();
 const server = http.createServer(app);
-dotenv.config();
 
-const People = require('./models/People');
-async function createAdminUser() {
-    try {
-        const existingUser = await People.findOne({ email: 'slymanamyr295@gmail.com' });
-        if (!existingUser) {
-            const newAdmin = new People({
-                name: 'slyman admin',
-                email: 'slymanamyr295@gmail.com',
-                mobile: '00966500000000',
-                password: 'y6j2iu4gwu7dniiw',
-                role: 'admin',
-            });
-            await newAdmin.save();
-            console.log('Admin user created successfully!');
-        } else {
-            console.log('Admin user already exists.');
-        }
-    } catch (error) {
-        console.error('Error creating admin user:', error);
-    }
-}
-createAdminUser();
+mongoose.connect(process.env.database_url)
+    .then(() => console.log("Database connection successful!"))
+    .catch(err => console.error("Database connection error:", err));
 
-const io = require("socket.io")(server);
-global.io = io;
+const loginRouter = require( ./router/loginRouter );
+const InboxRouter = require( ./router/InboxRouter );
+const TboxRouter = require( ./router/TboxRouter );
+const UsersRouter = require( ./router/UsersRouter );
 
-app.locals.moment = moment;
+const { notFoundHandler, errorHandler } = require( ./midlewares/common/errorHandler );
 
-mongoose.set("strictQuery", true);
-mongoose
-  .connect(process.env.database_url)
-  .then(() => console.log("Database connection successful!"))
-  .catch((err) => console.error("Database connection error:", err));
+app.set("view engine", "ejs");
+
+app.use(express.static(path.join(__dirname,  public )));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.set("view engine", "ejs");
-
-app.use(express.static(path.join(__dirname, "public")));
-
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
-app.use("/", LoginRouter);
-app.use("/users", UsersRouter);
-app.use("/inbox", InboxRouter);
+async function createAdminUser() {
+    try {
+        const People = require( ./models/People );
+        const existingAdmin = await People.findOne({ email:  slymunumy29@gmail.com  });
+        if (!existingAdmin) {
+            const newAdmin = new People({
+                name:  Slyman admin ,
+                email:  slymunumy29@gmail.com ,
+                mobile:  05xxxxxxxx ,
+                password:  password ,
+                role:  admin ,
+            });
+            await newAdmin.save();
+            console.log( Admin user created successfully! );
+        } else {
+            console.log( Admin user already exists. );
+        }
+    } catch (error) {
+        console.error( Error creating admin user: , error);
+    }
+}
+// createAdminUser();
+
+app.use( /login , loginRouter);
+app.use( /inbox , InboxRouter);
+app.use( /tbox , TboxRouter);
+app.use( /users , UsersRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-  console.log(`App is listening to port: ${PORT}`);
+    console.log(`App is listening to port ${PORT}`);
 });
