@@ -1,22 +1,20 @@
 // external dependencies
 const express = require("express");
 
-// internal dependencies
 const {
   getUsers,
   addUser,
   removeUser,
 } = require("../controller/usersController");
 const decorateHtmlResponse = require("../middlewares/common/decorateHtmlResponse");
-const avatarUpload = require("../middlewares/users/avatarUpload");
 const {
-  addUserValidators,
+  addUsersValidators,
   addUserValidationHandler,
 } = require("../middlewares/users/userValidators");
-
+const avatarUpload = require("../middlewares/users/avatarUpload");
 const { checkLogin, requireRole } = require("../middlewares/common/checkLogin");
 
-//initiate the router
+// initiate the router
 const router = express.Router();
 
 // users page
@@ -34,7 +32,7 @@ router.post(
   checkLogin,
   requireRole(["admin"]),
   avatarUpload,
-  addUserValidators,
+  addUsersValidators,
   addUserValidationHandler,
   addUser
 );
