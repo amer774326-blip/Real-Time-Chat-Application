@@ -1,8 +1,9 @@
-//external dependencies
+// external dependencies
 const bcrypt = require("bcrypt");
 const fs = require("fs");
 const path = require("path");
 
+// internal dependencies
 const People = require("../models/People");
 const createHttpError = require("http-errors");
 const { unlink } = require("fs");
@@ -10,7 +11,7 @@ const { unlink } = require("fs");
 // get users page
 async function getUsers(req, res, next) {
   try {
-    const users = await People.find();
+    const users = await People.find({});
     res.render("users", {
       users: users,
     });
@@ -64,7 +65,7 @@ async function removeUser(req, res, next) {
     // remove user avatar if any
     if (user.avatar) {
       unlink(
-        path.join(__dirname, `/../public/uploads/avatars/${user.avatar}`),
+        path.join(__dirname, "/../public/uploads/avatars/", user.avatar),
         (err) => {
           if (err) console.log(err);
         }
