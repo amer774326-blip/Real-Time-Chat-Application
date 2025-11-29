@@ -1,15 +1,16 @@
 //external dependencies
 const bcrypt = require("bcrypt");
-const { unlink } = require("fs");
+const fs = require("fs");
 const path = require("path");
 
-//internal dependencies
-const User = require("../models/People");
+const People = require("../models/People");
+const createHttpError = require("http-errors");
+const { unlink } = require("fs");
 
 // get users page
 async function getUsers(req, res, next) {
   try {
-    const users = await User.find();
+    const users = await People.find();
     res.render("users", {
       users: users,
     });
@@ -18,19 +19,19 @@ async function getUsers(req, res, next) {
   }
 }
 
-// add user in database
+// add user
 async function addUser(req, res, next) {
   let newUser;
   const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
   if (req.files && req.files.length > 0) {
-    newUser = new User({
+    newUser = new People({
       ...req.body,
-      avatar: req.files[0].filename,
       password: hashedPassword,
+      avatar: req.files[0].filename,
     });
   } else {
-    newUser = new User({
+    newUser = new People({
       ...req.body,
       password: hashedPassword,
     });
@@ -46,17 +47,17 @@ async function addUser(req, res, next) {
     res.status(500).json({
       errors: {
         common: {
-          msg: "Unknown error occured!",
+          msg: "Unknown error occurred!",
         },
       },
     });
   }
 }
 
-// remove user from databse and delete the avatar from file-system
+// remove user
 async function removeUser(req, res, next) {
   try {
-    const user = await User.findByIdAndDelete({
+    const user = await People.findByIdAndDelete({
       _id: req.params.id,
     });
 
