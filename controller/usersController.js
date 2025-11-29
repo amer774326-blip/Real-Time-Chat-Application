@@ -1,93 +1,83 @@
 // external dependencies
-const bcrypt = require("bcrypt");
-const fs = require("fs");
+const { check, validationResult } = require("express-validator");
+const createError = require("http-errors");
 const path = require("path");
-
-// internal dependencies
-const People = require("../models/People");
-const createHttpError = require("http-errors");
 const { unlink } = require("fs");
 
-// get users page
-async function getUsers(req, res, next) {
-  try {
-    const users = await People.find({});
-    res.render("users", {
-      users: users,
-    });
-  } catch (err) {
-    next(err);
-  }
-}
+// internal dependencies
+const User = require("../../models/People");
 
-// add user
-async function addUser(req, res, next) {
-  let newUser;
-  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+// add user validator
+const addUserValidators = [
+  check("name")
+    .isLength({ min: 1 })
+    .withMessage("Name is required")
+    .isAlpha("en-US", { ignore: " -" })
+    .withMessage("Name must not contain anything other than alphabet")
+    .trim(),
+  check("email")
+    .isEmail()
+    .withMessage("Invalid email address")
+    .trim()
+    .custom(async (value) => {
+      try {
+        const user = await User.findOne({ email: value });
+        if (user) {
+          throw createError("Email already in use!");
+        }
+      } catch (err) {
+        throw createError(err.message);
+      }
+    }),
+  check("mobile")
+    .isMobilePhone("bn-BD", {
+      strictMode: true,
+    })
+    .withMessage("Mobile number must be a valid Bangladeshi mobile number")
+    .custom(async (value) => {
+      try {
+        const user = await User.findOne({ mobile: value });
+        if (user) {
+          throw createError("Mobile number already in use!");
+        }
+      } catch (err) {
+        throw createError(err.message);
+      }
+    }),
+  check("password")
+    .isStrongPassword()
+    .withMessage(
+      "Password must be at least 8 characters long & should contain at least 1 lowercase, 1 uppercase, 1 number & 1 symbol"
+    ),
+];
 
-  if (req.files && req.files.length > 0) {
-    newUser = new People({
-      ...req.body,
-      password: hashedPassword,
-      avatar: req.files[0].filename,
-    });
+// handle error if any occurs in adding users
+const addUserValidationHandler = function (req, res, next) {
+  const errors = validationResult(req);
+  const mappedErrors = errors.mapped();
+
+  if (Object.keys(mappedErrors).length === 0) {
+    next();
   } else {
-    newUser = new People({
-      ...req.body,
-      password: hashedPassword,
-    });
-  }
-
-  // save user or send error
-  try {
-    const result = await newUser.save();
-    res.status(200).json({
-      message: "User was added successfully!",
-    });
-  } catch (err) {
-    res.status(500).json({
-      errors: {
-        common: {
-          msg: "Unknown error occurred!",
-        },
-      },
-    });
-  }
-}
-
-// remove user
-async function removeUser(req, res, next) {
-  try {
-    const user = await People.findByIdAndDelete({
-      _id: req.params.id,
-    });
-
-    // remove user avatar if any
-    if (user.avatar) {
+    // remove uploaded files
+    if (req.files && req.files.length > 0) {
+      const { filename } = req.files[0];
       unlink(
-        path.join(__dirname, "/../public/uploads/avatars/", user.avatar),
+        path.join(__dirname, "/../public/uploads/avatars/", filename),
         (err) => {
           if (err) console.log(err);
         }
       );
     }
 
-    res.status(200).json({
-      message: "User was removed successfully!",
-    });
-  } catch (err) {
+    // response the errors
     res.status(500).json({
-      errors: {
-        common: {
-          msg: "Could not delete the user!",
-        },
-      },
+      errors: mappedErrors,
     });
   }
-}
+};
 
 module.exports = {
-  getUsers,
-  addUser,
-  removeUser,
+  addUserValidators,
+  addUserValidationHandler,
 };
