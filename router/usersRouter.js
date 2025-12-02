@@ -1,38 +1,29 @@
-// external dependencies
 const express = require("express");
-
+const router = express.Router();
 const {
   getUsers,
   addUser,
-  removeUser,
+  removeUser
 } = require("../controller/usersController");
-const decorateHtmlResponse = require("../middlewares/common/decorateHtmlResponse");
 const {
-  addUsersValidators,
-  addUserValidationHandler,
+  addUserValidators,
+  addUserValidationHandler
 } = require("../middlewares/users/userValidators");
-const avatarUpload = require("../middlewares/users/avatarUpload");
-const { checkLogin, requireRole } = require("../middlewares/common/checkLogin");
-
-// initiate the router
-const router = express.Router();
+const {
+  checkLogin,
+  redirectLoggedIn,
+  requireRole
+} = require("../middlewares/common/checkLogin");
 
 // users page
-router.get(
-  "/",
-  decorateHtmlResponse("Users"),
-  checkLogin,
-  requireRole(["admin"]),
-  getUsers
-);
+router.get("/", checkLogin, requireRole(["admin"]), getUsers);
 
 // add user
 router.post(
   "/",
   checkLogin,
   requireRole(["admin"]),
-  avatarUpload,
-  addUsersValidators,
+  addUserValidators,
   addUserValidationHandler,
   addUser
 );
