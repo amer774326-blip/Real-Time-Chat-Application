@@ -1,32 +1,26 @@
-//external dependencies
 const { check, validationResult } = require("express-validator");
-const createError = require("http-errors");
-const path = require("path");
-const { unlink } = require("fs");
+const createHttpError = require("http-errors");
+const People = require("../models/People");
 
-//internal dependencies
-const User = require("../../models/People");
-
-// add user validator
 const addUserValidators = [
   check("name")
-    .isLength({ min: 3 })
+    .isLength({ min: 1 })
     .withMessage("Name is required")
     .isAlpha("en-US", { ignore: " -" })
     .withMessage("Name must not contain anything other than alphabet")
     .trim(),
   check("email")
     .isEmail()
-    .withMessage("Invalid email address")
+    .withMessage("Invalid e-mail address")
     .trim()
     .custom(async (value) => {
       try {
-        const user = await User.findOne({ email: value });
+        const user = await People.findOne({ email: value });
         if (user) {
-          throw createError("Email already is use!");
+          throw createHttpError("E-mail already in use!");
         }
       } catch (err) {
-        throw createError(err.message);
+        throw createHttpError(err.message);
       }
     }),
   check("mobile")
@@ -36,40 +30,28 @@ const addUserValidators = [
     .withMessage("Mobile number must be a valid Bangladeshi mobile number")
     .custom(async (value) => {
       try {
-        const user = await User.findOne({ mobile: value });
+        const user = await People.findOne({ mobile: value });
         if (user) {
-          throw createError("Mobile already is use!");
+          throw createHttpError("Mobile number already in use!");
         }
       } catch (err) {
-        throw createError(err.message);
+        throw createHttpError(err.message);
       }
     }),
   check("password")
+    .isLength({ min: 1 })
+    .withMessage("Password is required")
     .isStrongPassword()
-    .withMessage(
-      "Password must be at least 8 characters long & should contain at least 1 lowercase, 1 uppercase, 1 number & 1 symbol"
-    ),
+    .withMessage("Password is not strong enough!"),
 ];
 
-//handle error if any error occurs in adding users
 const addUserValidationHandler = function (req, res, next) {
   const errors = validationResult(req);
   const mappedErrors = errors.mapped();
   if (Object.keys(mappedErrors).length === 0) {
     next();
   } else {
-    // remove uploaded files
-    if (req.files.length > 0) {
-      const { filename } = req.files[0];
-      unlink(
-        path.join(__dirname, `/../public/uploads/avatars/${filename}`),
-        (err) => {
-          if (err) console.log(err);
-        }
-      );
-    }
-
-    // response the errors
+    // response errors
     res.status(500).json({
       errors: mappedErrors,
     });
