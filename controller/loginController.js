@@ -1,21 +1,16 @@
-// external dependencies
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const createError = require("http-errors");
 
-// internal dependencies
-const User = require("../models/People");
+const People = require("../models/People"); 
 
-// get login page
-function getLogin(req, res, next) {
+async function getLogin(req, res, next) {
   res.render("index");
 }
 
-// do login
 async function login(req, res, next) {
   try {
-    // find a user who has this email/username
-    const user = await User.findOne({
+    const user = await People.findOne({
       $or: [{ email: req.body.username }, { mobile: req.body.username }],
     });
 
@@ -26,7 +21,6 @@ async function login(req, res, next) {
       );
 
       if (isValidPassword) {
-        // prepare the user object to generate token
         const userObject = {
           userid: user._id,
           username: user.name,
@@ -35,19 +29,16 @@ async function login(req, res, next) {
           role: user.role || "user",
         };
 
-        // generate token
         const token = jwt.sign(userObject, process.env.JWT_SECRET, {
           expiresIn: process.env.JWT_EXPIRY,
         });
 
-        // set cookie
         res.cookie(process.env.COOKIE_NAME, token, {
           maxAge: process.env.JWT_EXPIRY,
           httpOnly: true,
           signed: true,
         });
 
-        // set logged in user local identifier
         res.locals.loggedInUser = userObject;
 
         res.redirect("inbox");
@@ -71,7 +62,6 @@ async function login(req, res, next) {
   }
 }
 
-// do logout
 function logout(req, res) {
   res.clearCookie(process.env.COOKIE_NAME);
   res.send("logged out");
