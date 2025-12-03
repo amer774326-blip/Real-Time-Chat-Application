@@ -5,7 +5,7 @@ const path = require("path");
 const { unlink } = require("fs");
 
 //internal dependencies
-const User = require("../../models/People");
+const People = require("../../models/People");
 
 // add user validator
 const addUserValidators = [
